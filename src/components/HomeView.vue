@@ -1,10 +1,12 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { TOPICS, loadStats } from '../data/content.js'
+import { MISSIONS } from '../data/missions.js'
 
-const emit = defineEmits(['start', 'sheet'])
+const emit = defineEmits(['start', 'sheet', 'build'])
 const stats = ref({ exams: 0, best: 0, played: 0 })
 const topic = ref(TOPICS[0].id)
+const mission = ref(MISSIONS[0].id)
 
 onMounted(() => {
   stats.value = loadStats()
@@ -16,15 +18,15 @@ onMounted(() => {
     <p class="kicker">Проектирование информационных систем</p>
     <h1>Диаграммист</h1>
     <p class="lead">
-      Игра-тест: отличите прецедент от класса, ICOM от потока данных и не перепутайте
-      уровень декомпозиции. UML, IDEF0 и DFD — как на зачёте, только с чертежами.
+      Игра-тест и чертёжный стол: отличите прецедент от класса, соберите IDEF0 по ICOM
+      и не перепутайте уровень декомпозиции. UML, IDEF0 и DFD — как на зачёте, только с листом.
     </p>
 
     <div class="modes">
       <button class="mode exam" type="button" @click="emit('start', { mode: 'exam' })">
-        <span class="tag">12 вопросов · 8 минут</span>
+        <span class="tag">8 вопросов + 2 чертежа · 20 минут</span>
         <strong>Экзамен</strong>
-        <em>Случайный набор по всем темам. Проходной балл — 70%.</em>
+        <em>Теория и построение диаграмм. Чертёж даёт 2 балла. Проходной — 70%.</em>
       </button>
       <button class="mode guess" type="button" @click="emit('start', { mode: 'identify' })">
         <span class="tag">Только картинки</span>
@@ -52,6 +54,28 @@ onMounted(() => {
       </div>
       <button class="go" type="button" @click="emit('start', { mode: 'trainer', topic })">
         Начать тему
+      </button>
+    </div>
+
+    <div class="trainer">
+      <div class="trainer-head">
+        <strong>Конструктор</strong>
+        <span>Сложные листы и свой элемент: функции, процессы, связи include/ICOM</span>
+      </div>
+      <div class="chips">
+        <button
+          v-for="m in MISSIONS"
+          :key="m.id"
+          type="button"
+          class="chip"
+          :class="{ on: mission === m.id }"
+          @click="mission = m.id"
+        >
+          {{ m.title }}
+        </button>
+      </div>
+      <button class="go" type="button" @click="emit('build', mission)">
+        Открыть чертёжный стол
       </button>
     </div>
 

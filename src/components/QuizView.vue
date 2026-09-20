@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import DiagramView from './DiagramView.vue'
+import BuildView from './BuildView.vue'
 
 const props = defineProps({
   session: { type: Object, required: true },
@@ -13,11 +14,13 @@ const locked = ref(false)
 const answers = ref([])
 const now = ref(Date.now())
 const done = ref(false)
+const buildNotes = ref([])
 let timer
 
 const question = computed(() => props.session.questions[index.value])
 const total = computed(() => props.session.questions.length)
 const isHotspot = computed(() => question.value.type === 'hotspot')
+const isBuild = computed(() => question.value.type === 'build')
 const remain = computed(() => {
   if (!props.session.limitMs) return null
   return Math.max(0, props.session.startedAt + props.session.limitMs - now.value)
@@ -29,7 +32,9 @@ const remainLabel = computed(() => {
   const r = String(s % 60).padStart(2, '0')
   return `${m}:${r}`
 })
-const ok = computed(() => chosen.value === question.value.correct)
+const ok = computed(() =>
+  isBuild.value ? chosen.value === 'ok' : chosen.value === question.value.correct,
+)
 const last = computed(() => index.value === total.value - 1)
 
 function pick(id) {
@@ -44,10 +49,28 @@ function submit() {
   answers.value.push({
     id: question.value.id,
     topic: question.value.topic,
+    type: question.value.type,
     correct: question.value.correct,
     chosen: chosen.value,
     ok: chosen.value === question.value.correct,
     prompt: question.value.prompt,
+  })
+}
+
+function submitBuild(payload) {
+  if (locked.value) return
+  locked.value = true
+  chosen.value = payload.pass ? 'ok' : 'fail'
+  buildNotes.value = (payload.notes || []).filter((n) => !n.ok).map((n) => n.text)
+  answers.value.push({
+    id: question.value.id,
+    topic: question.value.topic,
+    type: 'build',
+    correct: 'ok',
+    chosen: chosen.value,
+    ok: Boolean(payload.pass),
+    prompt: question.value.prompt,
+    notes: buildNotes.value,
   })
 }
 
@@ -60,6 +83,11 @@ function next() {
   index.value += 1
   chosen.value = ''
   locked.value = false
+  buildNotes.value = []
+}
+
+function weightOf(item) {
+  return item.type === 'build' ? 2 : 1
 }
 
 function finish(expired = false) {
@@ -68,18 +96,20 @@ function finish(expired = false) {
   const pending = props.session.questions.slice(answers.value.length).map((q) => ({
     id: q.id,
     topic: q.topic,
+    type: q.type,
     correct: q.correct,
     chosen: '',
     ok: false,
     prompt: q.prompt,
   }))
   const all = [...answers.value, ...pending]
-  const right = all.filter((a) => a.ok).length
+  const totalW = all.reduce((sum, a) => sum + weightOf(a), 0)
+  const rightW = all.filter((a) => a.ok).reduce((sum, a) => sum + weightOf(a), 0)
   emit('finish', {
     mode: props.session.mode,
-    total: all.length,
-    right,
-    percent: Math.round((right / all.length) * 100),
+    total: totalW,
+    right: rightW,
+    percent: Math.round((rightW / totalW) * 100),
     answers: all,
     expired,
     questions: props.session.questions,
@@ -107,8 +137,15 @@ onBeforeUnmount(() => clearInterval(timer))
     </div>
 
     <article class="card">
-      <p class="topic">{{ question.topic.toUpperCase() }}</p>
+      <p class="topic">{{ question.topic.toUpperCase() }}{{ isBuild ? ' · чертёж ×2 балла' : '' }}</p>
       <h2>{{ question.prompt }}</h2>
+      <BuildView
+        v-if="isBuild && !locked"
+        :key="question.id"
+        exam
+        :mission-id="question.missionId"
+        @submit="submitBuild"
+      />
       <DiagramView
         v-if="question.diagram"
         :name="question.diagram"
@@ -139,10 +176,14 @@ onBeforeUnmount(() => clearInterval(timer))
       <p v-if="isHotspot && !locked" class="hint">Нажмите на элемент чертежа.</p>
       <div v-if="locked" class="explain" :class="{ good: ok, fail: !ok }">
         <strong>{{ ok ? 'Верно' : 'Неверно' }}</strong>
-        <p>{{ question.explanation }}</p>
+        <p v-if="!isBuild">{{ question.explanation }}</p>
+        <ul v-else-if="buildNotes.length">
+          <li v-for="(note, i) in buildNotes" :key="i">{{ note }}</li>
+        </ul>
+        <p v-else>{{ question.explanation }}</p>
       </div>
       <div class="actions">
-        <button v-if="!locked && !isHotspot" class="go" type="button" :disabled="!chosen" @click="submit">
+        <button v-if="!locked && !isHotspot && !isBuild" class="go" type="button" :disabled="!chosen" @click="submit">
           Ответить
         </button>
         <button v-if="locked" class="go" type="button" @click="next">
@@ -257,7 +298,8 @@ h2 {
 .explain.fail {
   background: rgba(224, 122, 122, 0.1);
 }
-.explain p {
+.explain p,
+.explain ul {
   margin: 6px 0 0;
   color: #c5d5de;
 }

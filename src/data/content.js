@@ -1,38 +1,40 @@
+import { MISSIONS } from './missions.js'
+
 export const TOPICS = [
   {
     id: 'usecase',
     title: 'Прецеденты и классы',
-    short: 'Use Case · Class',
+    short: 'Прецеденты и классы',
     hint: 'Акторы, сценарии, структура объектов',
   },
   {
     id: 'interaction',
     title: 'Последовательности и деятельность',
-    short: 'Sequence · Activity',
+    short: 'Последовательности и деятельность',
     hint: 'Время, сообщения, ветвления',
   },
   {
     id: 'structure',
     title: 'Компоненты и развёртывание',
-    short: 'Component · Deployment',
+    short: 'Компоненты и развёртывание',
     hint: 'Сборка системы и железо',
   },
   {
     id: 'uml',
     title: 'Язык UML',
-    short: 'UML целиком',
+    short: 'Диаграммы UML',
     hint: 'Какую диаграмму выбрать',
   },
   {
     id: 'idef0',
     title: 'IDEF0',
-    short: 'Декомпозиция · дерево узлов',
+    short: 'IDEF0: декомпозиция и дерево узлов',
     hint: 'ICOM, A-0, уровни 1 и 2',
   },
   {
     id: 'dfd',
     title: 'Потоки данных',
-    short: 'DFD',
+    short: 'Потоки данных (DFD)',
     hint: 'Процессы, хранилища, балансировка',
   },
 ]
@@ -757,12 +759,46 @@ export function rankFor(percent) {
   return { title: 'Наблюдатель чертежей', tone: 'rose' }
 }
 
+function pickExamBuilds() {
+  const buckets = [
+    MISSIONS.filter((m) => ['uc-lib', 'cl-shop'].includes(m.id)),
+    MISSIONS.filter((m) => String(m.id).startsWith('i0-')),
+    MISSIONS.filter((m) => String(m.id).startsWith('dfd-')),
+    MISSIONS.filter((m) => ['cp-plat', 'dp-prod'].includes(m.id)),
+  ]
+  return shuffle(buckets)
+    .slice(0, 2)
+    .map((bucket) => shuffle(bucket)[0])
+    .filter(Boolean)
+}
+
 export function buildSession({ mode, topic, questions }) {
   let pool
   if (questions) pool = questions
   else if (mode === 'identify') pool = QUESTIONS.filter((q) => q.identify)
   else if (mode === 'trainer' && topic) pool = QUESTIONS.filter((q) => q.topic === topic)
-  else {
+  else if (mode === 'exam') {
+    const byTopic = TOPICS.map((t) => shuffle(QUESTIONS.filter((q) => q.topic === t.id)))
+    const quiz = []
+    let i = 0
+    while (quiz.length < 8) {
+      for (const group of byTopic) {
+        if (group[i]) quiz.push(group[i])
+        if (quiz.length >= 8) break
+      }
+      i += 1
+      if (i > 20) break
+    }
+    const builds = pickExamBuilds().map((m) => ({
+      id: 'build-' + m.id,
+      type: 'build',
+      topic: m.topic,
+      missionId: m.id,
+      prompt: 'Постройте диаграмму: ' + m.title,
+      explanation: m.hint,
+    }))
+    pool = [...shuffle(quiz), ...builds]
+  } else {
     const byTopic = TOPICS.map((t) => shuffle(QUESTIONS.filter((q) => q.topic === t.id)))
     pool = []
     let i = 0
@@ -785,7 +821,7 @@ export function buildSession({ mode, topic, questions }) {
       options: q.options ? shuffle(q.options) : undefined,
     })),
     startedAt: Date.now(),
-    limitMs: mode === 'exam' ? 8 * 60 * 1000 : null,
+    limitMs: mode === 'exam' ? 20 * 60 * 1000 : null,
   }
 }
 

@@ -26,7 +26,7 @@ const mistakes = computed(() => props.result.answers.filter((a) => !a.ok))
     <h1>{{ result.percent }}%</h1>
     <p class="rank" :data-tone="rank.tone">{{ rank.title }}</p>
     <p class="sum">
-      {{ result.right }} из {{ result.total }} верно
+      {{ result.right }} из {{ result.total }} {{ result.mode === 'exam' ? 'баллов' : 'верно' }}
       <span v-if="result.mode === 'exam'"> · экзамен {{ passed ? 'сдан' : 'не сдан' }} (нужно 70%)</span>
     </p>
     <div class="topics">

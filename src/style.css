@@ -46,6 +46,10 @@ body {
   position: relative;
 }
 
+.app.wide {
+  max-width: 1120px;
+}
+
 .app::before {
   content: '';
   position: fixed;
