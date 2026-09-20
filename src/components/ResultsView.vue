@@ -1,0 +1,164 @@
+<script setup>
+import { computed } from 'vue'
+import { TOPICS, rankFor } from '../data/content.js'
+
+const props = defineProps({
+  result: { type: Object, required: true },
+})
+const emit = defineEmits(['home', 'retry', 'mistakes'])
+
+const rank = computed(() => rankFor(props.result.percent))
+const passed = computed(() => props.result.percent >= 70)
+const byTopic = computed(() =>
+  TOPICS.map((t) => {
+    const rows = props.result.answers.filter((a) => a.topic === t.id)
+    if (!rows.length) return null
+    const right = rows.filter((a) => a.ok).length
+    return { ...t, right, total: rows.length, pct: Math.round((right / rows.length) * 100) }
+  }).filter(Boolean),
+)
+const mistakes = computed(() => props.result.answers.filter((a) => !a.ok))
+</script>
+
+<template>
+  <section class="res">
+    <p class="kicker">{{ result.expired ? 'Время вышло' : 'Сессия закрыта' }}</p>
+    <h1>{{ result.percent }}%</h1>
+    <p class="rank" :data-tone="rank.tone">{{ rank.title }}</p>
+    <p class="sum">
+      {{ result.right }} из {{ result.total }} верно
+      <span v-if="result.mode === 'exam'"> · экзамен {{ passed ? 'сдан' : 'не сдан' }} (нужно 70%)</span>
+    </p>
+    <div class="topics">
+      <div v-for="t in byTopic" :key="t.id" class="row">
+        <span>{{ t.title }}</span>
+        <b>{{ t.right }}/{{ t.total }}</b>
+        <i><em :style="{ width: t.pct + '%' }" /></i>
+      </div>
+    </div>
+    <div v-if="mistakes.length" class="miss">
+      <h3>Разобрать ошибки</h3>
+      <ol>
+        <li v-for="m in mistakes" :key="m.id">{{ m.prompt }}</li>
+      </ol>
+    </div>
+    <div class="acts">
+      <button class="go" type="button" @click="emit('retry')">Ещё раз</button>
+      <button v-if="mistakes.length" class="alt" type="button" @click="emit('mistakes')">Только ошибки</button>
+      <button class="ghost" type="button" @click="emit('home')">На главную</button>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.res {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+.kicker {
+  margin: 0;
+  color: #e8b86d;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 700;
+}
+h1 {
+  margin: 0;
+  font-family: Unbounded, sans-serif;
+  font-size: clamp(56px, 12vw, 96px);
+  line-height: 0.9;
+}
+.rank {
+  margin: 0;
+  font-family: Unbounded, sans-serif;
+  font-size: 22px;
+}
+.rank[data-tone='gold'] {
+  color: #e8b86d;
+}
+.rank[data-tone='cyan'] {
+  color: #3ec8d8;
+}
+.rank[data-tone='ok'] {
+  color: #5dce9a;
+}
+.rank[data-tone='rose'] {
+  color: #e07a7a;
+}
+.sum {
+  color: #9fb3c0;
+  margin: 0 0 8px;
+}
+.topics {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+}
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+}
+.row i {
+  grid-column: 1 / -1;
+  height: 6px;
+  background: #123040;
+  border-radius: 99px;
+  display: block;
+}
+.row em {
+  display: block;
+  height: 100%;
+  background: #3ec8d8;
+  border-radius: inherit;
+}
+.miss {
+  width: 100%;
+  background: rgba(14, 32, 42, 0.85);
+  border: 1px solid rgba(62, 200, 216, 0.2);
+  border-radius: 16px;
+  padding: 16px 18px;
+}
+.miss h3 {
+  margin: 0 0 8px;
+  font-family: Unbounded, sans-serif;
+  font-size: 16px;
+}
+.miss ol {
+  margin: 0;
+  color: #c5d5de;
+  padding-left: 18px;
+}
+.acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+.go,
+.alt,
+.ghost {
+  font: inherit;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+.go {
+  background: #3ec8d8;
+  border: 0;
+  color: #071018;
+}
+.alt {
+  background: transparent;
+  border: 1px solid #e8b86d;
+  color: #e8b86d;
+}
+.ghost {
+  background: transparent;
+  border: 1px solid rgba(138, 163, 179, 0.35);
+  color: #9fb3c0;
+}
+</style>
