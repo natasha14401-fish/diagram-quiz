@@ -97,7 +97,7 @@ onMounted(() => {
 }
 .kicker {
   margin: 0;
-  color: #e8b86d;
+  color: var(--gold);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   font-size: 12px;
@@ -113,7 +113,7 @@ h1 {
 .lead {
   margin: 0;
   max-width: 58ch;
-  color: #9fb3c0;
+  color: var(--muted);
   font-size: 18px;
 }
 .modes {
@@ -124,8 +124,9 @@ h1 {
 .mode,
 .trainer {
   text-align: left;
-  background: rgba(14, 32, 42, 0.85);
-  border: 1px solid rgba(62, 200, 216, 0.22);
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow);
   border-radius: 18px;
   padding: 20px;
   color: inherit;
@@ -138,11 +139,11 @@ h1 {
 }
 .mode:hover {
   transform: translateY(-2px);
-  border-color: #3ec8d8;
+  border-color: var(--cyan);
 }
 .tag {
   font-size: 12px;
-  color: #8aa3b3;
+  color: var(--muted);
 }
 .mode strong,
 .trainer-head strong {
@@ -151,10 +152,10 @@ h1 {
 }
 .mode em {
   font-style: normal;
-  color: #9fb3c0;
+  color: var(--muted);
 }
 .exam {
-  box-shadow: inset 0 0 0 1px rgba(232, 184, 109, 0.2);
+  box-shadow: var(--shadow), inset 0 0 0 1px rgba(176, 120, 32, 0.28);
 }
 .trainer {
   display: grid;
@@ -168,7 +169,7 @@ h1 {
   flex-wrap: wrap;
 }
 .trainer-head span {
-  color: #8aa3b3;
+  color: var(--muted);
 }
 .chips {
   display: flex;
@@ -183,20 +184,20 @@ h1 {
 }
 .chip {
   border-radius: 999px;
-  border: 1px solid rgba(62, 200, 216, 0.25);
+  border: 1px solid var(--card-border);
   background: transparent;
-  color: #d7e6ee;
+  color: var(--ink);
   padding: 8px 12px;
 }
 .chip.on {
-  background: #3ec8d8;
-  color: #071018;
-  border-color: #3ec8d8;
+  background: var(--cyan-bright);
+  color: var(--btn-ink);
+  border-color: var(--cyan-bright);
 }
 .go {
   justify-self: start;
-  background: #e8b86d;
-  color: #071018;
+  background: var(--gold-bright);
+  color: var(--btn-ink);
   border: 0;
   border-radius: 999px;
   padding: 10px 18px;
@@ -212,7 +213,7 @@ h1 {
 .link {
   background: none;
   border: 0;
-  color: #3ec8d8;
+  color: var(--cyan);
   padding: 0;
   text-decoration: underline;
   text-underline-offset: 4px;
@@ -223,7 +224,7 @@ h1 {
   list-style: none;
   margin: 0;
   padding: 0;
-  color: #8aa3b3;
+  color: var(--muted);
   font-size: 14px;
 }
 @media (max-width: 720px) {

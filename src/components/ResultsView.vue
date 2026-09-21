@@ -58,7 +58,7 @@ const mistakes = computed(() => props.result.answers.filter((a) => !a.ok))
 }
 .kicker {
   margin: 0;
-  color: #e8b86d;
+  color: var(--gold);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   font-size: 12px;
@@ -76,19 +76,19 @@ h1 {
   font-size: 22px;
 }
 .rank[data-tone='gold'] {
-  color: #e8b86d;
+  color: var(--gold);
 }
 .rank[data-tone='cyan'] {
-  color: #3ec8d8;
+  color: var(--cyan);
 }
 .rank[data-tone='ok'] {
-  color: #5dce9a;
+  color: var(--ok);
 }
 .rank[data-tone='rose'] {
-  color: #e07a7a;
+  color: var(--rose);
 }
 .sum {
-  color: #9fb3c0;
+  color: var(--muted);
   margin: 0 0 8px;
 }
 .topics {
@@ -104,20 +104,21 @@ h1 {
 .row i {
   grid-column: 1 / -1;
   height: 6px;
-  background: #123040;
+  background: var(--track);
   border-radius: 99px;
   display: block;
 }
 .row em {
   display: block;
   height: 100%;
-  background: #3ec8d8;
+  background: var(--cyan);
   border-radius: inherit;
 }
 .miss {
   width: 100%;
-  background: rgba(14, 32, 42, 0.85);
-  border: 1px solid rgba(62, 200, 216, 0.2);
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow);
   border-radius: 16px;
   padding: 16px 18px;
 }
@@ -128,7 +129,7 @@ h1 {
 }
 .miss ol {
   margin: 0;
-  color: #c5d5de;
+  color: var(--ink);
   padding-left: 18px;
 }
 .acts {
@@ -147,18 +148,18 @@ h1 {
   cursor: pointer;
 }
 .go {
-  background: #3ec8d8;
+  background: var(--cyan-bright);
   border: 0;
-  color: #071018;
+  color: var(--btn-ink);
 }
 .alt {
   background: transparent;
-  border: 1px solid #e8b86d;
-  color: #e8b86d;
+  border: 1px solid var(--gold);
+  color: var(--gold);
 }
 .ghost {
   background: transparent;
-  border: 1px solid rgba(138, 163, 179, 0.35);
-  color: #9fb3c0;
+  border: 1px solid rgba(93, 116, 130, 0.35);
+  color: var(--muted);
 }
 </style>

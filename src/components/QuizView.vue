@@ -208,34 +208,35 @@ onBeforeUnmount(() => clearInterval(timer))
 .ghost {
   font: inherit;
   background: transparent;
-  color: #8aa3b3;
-  border: 1px solid rgba(138, 163, 179, 0.3);
+  color: var(--muted);
+  border: 1px solid rgba(93, 116, 130, 0.3);
   border-radius: 999px;
   padding: 6px 12px;
   cursor: pointer;
 }
 .progress {
   height: 8px;
-  background: #123040;
+  background: var(--track);
   border-radius: 99px;
   overflow: hidden;
 }
 .progress i {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #3ec8d8, #e8b86d);
+  background: linear-gradient(90deg, var(--cyan-bright), var(--gold-bright));
 }
 .count,
 .time {
   font-variant-numeric: tabular-nums;
-  color: #9fb3c0;
+  color: var(--muted);
 }
 .time.low {
-  color: #e07a7a;
+  color: var(--rose);
 }
 .card {
-  background: rgba(14, 32, 42, 0.9);
-  border: 1px solid rgba(62, 200, 216, 0.22);
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow);
   border-radius: 18px;
   padding: 22px;
   display: grid;
@@ -245,7 +246,7 @@ onBeforeUnmount(() => clearInterval(timer))
   margin: 0;
   letter-spacing: 0.14em;
   font-size: 11px;
-  color: #e8b86d;
+  color: var(--gold);
 }
 h2 {
   margin: 0;
@@ -264,44 +265,44 @@ h2 {
   text-align: left;
   padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid rgba(62, 200, 216, 0.2);
-  background: #071018;
+  border: 1px solid var(--card-border);
+  background: var(--sheet);
   color: inherit;
   font: inherit;
   cursor: pointer;
 }
 .opt b {
-  color: #3ec8d8;
+  color: var(--cyan);
 }
 .opt.on {
-  border-color: #e8b86d;
+  border-color: var(--gold);
 }
 .opt.ok {
-  border-color: #5dce9a;
-  background: rgba(93, 206, 154, 0.08);
+  border-color: var(--ok);
+  background: rgba(42, 154, 106, 0.1);
 }
 .opt.bad {
-  border-color: #e07a7a;
-  background: rgba(224, 122, 122, 0.08);
+  border-color: var(--rose);
+  background: rgba(196, 90, 90, 0.1);
 }
 .hint {
   margin: 0;
-  color: #8aa3b3;
+  color: var(--muted);
 }
 .explain {
   border-radius: 12px;
   padding: 12px 14px;
 }
 .explain.good {
-  background: rgba(93, 206, 154, 0.1);
+  background: rgba(42, 154, 106, 0.12);
 }
 .explain.fail {
-  background: rgba(224, 122, 122, 0.1);
+  background: rgba(196, 90, 90, 0.12);
 }
 .explain p,
 .explain ul {
   margin: 6px 0 0;
-  color: #c5d5de;
+  color: var(--ink);
 }
 .actions {
   display: flex;
@@ -310,8 +311,8 @@ h2 {
 .go {
   font: inherit;
   font-weight: 700;
-  background: #3ec8d8;
-  color: #071018;
+  background: var(--cyan-bright);
+  color: var(--btn-ink);
   border: 0;
   border-radius: 999px;
   padding: 10px 18px;

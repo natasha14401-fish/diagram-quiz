@@ -518,14 +518,14 @@ const allowedLinks = computed(() => {
               <rect x="-78" y="-44" width="156" height="88" />
               <rect x="-90" y="-24" width="22" height="14" />
               <rect x="-90" y="4" width="22" height="14" />
-              <text class="tiny" dy="-8" text-anchor="middle">component</text>
+              <text class="tiny" dy="-8" text-anchor="middle">«компонент»</text>
               <text dy="14" text-anchor="middle">{{ n.label }}</text>
             </template>
             <template v-else-if="n.kind === 'device'">
+              <path d="M68 -40 L90 -58 L90 22 L68 40 Z" />
+              <path d="M-82 -40 L-60 -58 L90 -58 L68 -40 Z" />
               <rect x="-82" y="-40" width="150" height="80" />
-              <path class="line" d="M68 -40 l16 -12 v80 l-16 12" />
-              <path class="line" d="M-82 -40 l16 -12 h150 l-16 12" />
-              <text class="tiny" dy="-8" text-anchor="middle">device</text>
+              <text class="tiny" dy="-8" text-anchor="middle">«узел»</text>
               <text dy="14" text-anchor="middle">{{ n.label }}</text>
             </template>
           </g>
@@ -588,9 +588,9 @@ const allowedLinks = computed(() => {
 .pick,
 .field {
   width: 100%;
-  background: #0e202a;
+  background: var(--card);
   color: inherit;
-  border: 1px solid rgba(62, 200, 216, 0.3);
+  border: 1px solid var(--card-border);
   border-radius: 10px;
   padding: 8px 10px;
 }
@@ -599,7 +599,7 @@ const allowedLinks = computed(() => {
 }
 .exam-tag {
   margin: 0;
-  color: #e8b86d;
+  color: var(--gold);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   font-size: 12px;
@@ -607,8 +607,8 @@ const allowedLinks = computed(() => {
 }
 .ghost {
   background: transparent;
-  color: #8aa3b3;
-  border: 1px solid rgba(138, 163, 179, 0.3);
+  color: var(--muted);
+  border: 1px solid rgba(93, 116, 130, 0.3);
   border-radius: 999px;
   padding: 6px 12px;
   cursor: pointer;
@@ -617,7 +617,7 @@ const allowedLinks = computed(() => {
   margin: 0;
   letter-spacing: 0.14em;
   font-size: 11px;
-  color: #e8b86d;
+  color: var(--gold);
   text-transform: uppercase;
 }
 h2 {
@@ -628,13 +628,13 @@ h2 {
 .brief,
 .hint {
   margin: 0;
-  color: #9fb3c0;
+  color: var(--muted);
 }
 .hint {
   font-size: 14px;
 }
 .gold {
-  color: #e8b86d;
+  color: var(--gold);
 }
 .work {
   display: grid;
@@ -654,29 +654,29 @@ aside {
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #8aa3b3;
+  color: var(--muted);
 }
 .piece,
 .tools button {
   text-align: left;
-  background: #071018;
+  background: var(--card);
   color: inherit;
-  border: 1px solid rgba(62, 200, 216, 0.22);
+  border: 1px solid var(--card-border);
   border-radius: 10px;
   padding: 8px 10px;
   cursor: pointer;
 }
 .piece small {
   display: block;
-  color: #3ec8d8;
+  color: var(--cyan);
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .piece.on,
 .tools button.on {
-  border-color: #e8b86d;
-  color: #e8b86d;
+  border-color: var(--gold);
+  color: var(--gold);
 }
 .tools,
 .insp {
@@ -684,12 +684,13 @@ aside {
   gap: 6px;
 }
 .empty {
-  color: #8aa3b3;
+  color: var(--muted);
   font-size: 13px;
 }
 .sheet {
-  background: #07161f;
-  border: 1px solid rgba(62, 200, 216, 0.25);
+  background: var(--sheet);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow);
   border-radius: 14px;
   overflow: hidden;
 }
@@ -708,15 +709,15 @@ svg {
 .node rect,
 .node path,
 .node polygon {
-  fill: #0b1c26;
-  stroke: #3ec8d8;
+  fill: #ffffff;
+  stroke: var(--cyan);
   stroke-width: 1.6;
 }
 .node path.line {
   fill: none;
 }
 .node rect.store-fill {
-  fill: #0b1c26;
+  fill: #ffffff;
   stroke: none;
 }
 .node rect.store-bar {
@@ -724,14 +725,14 @@ svg {
   stroke: none;
 }
 .node text {
-  fill: #e8f1f5;
+  fill: var(--ink);
   font-size: 11px;
   font-family: Manrope, sans-serif;
 }
 .node .tiny,
 .cap {
   font-size: 10px;
-  fill: #8aa3b3;
+  fill: var(--muted);
 }
 .node.sel circle,
 .node.sel ellipse,
@@ -742,19 +743,19 @@ svg {
 .node.from ellipse,
 .node.from rect,
 .node.from polygon {
-  stroke: #e8b86d;
+  stroke: var(--gold);
 }
 .edge {
   cursor: pointer;
 }
 .edge text {
-  fill: #5dce9a;
+  fill: var(--ok);
   font-size: 11px;
 }
 .status {
   margin: 0;
   padding: 8px 12px 12px;
-  color: #8aa3b3;
+  color: var(--muted);
   font-size: 13px;
 }
 .acts {
@@ -763,8 +764,8 @@ svg {
   flex-wrap: wrap;
 }
 .go {
-  background: #3ec8d8;
-  color: #071018;
+  background: var(--cyan-bright);
+  color: var(--btn-ink);
   border: 0;
   border-radius: 999px;
   padding: 10px 18px;
@@ -772,12 +773,12 @@ svg {
   cursor: pointer;
 }
 .notes {
-  background: rgba(224, 122, 122, 0.1);
+  background: rgba(196, 90, 90, 0.12);
   border-radius: 12px;
   padding: 12px 14px;
 }
 .notes.pass {
-  background: rgba(93, 206, 154, 0.12);
+  background: rgba(42, 154, 106, 0.12);
 }
 .notes p {
   margin: 0 0 6px;
@@ -785,14 +786,15 @@ svg {
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(7, 16, 24, 0.72);
+  background: rgba(27, 45, 54, 0.4);
   display: grid;
   place-items: center;
   z-index: 20;
 }
 .modal .card {
-  background: #0e202a;
-  border: 1px solid rgba(62, 200, 216, 0.3);
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow);
   border-radius: 16px;
   padding: 18px;
   display: grid;
@@ -805,9 +807,9 @@ svg {
   gap: 6px;
 }
 .chips button {
-  background: #071018;
+  background: var(--sheet);
   color: inherit;
-  border: 1px solid rgba(62, 200, 216, 0.3);
+  border: 1px solid var(--card-border);
   border-radius: 999px;
   padding: 4px 10px;
   cursor: pointer;

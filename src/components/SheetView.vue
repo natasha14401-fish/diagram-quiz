@@ -41,16 +41,16 @@ const emit = defineEmits(['back'])
         <h2>IDEF0</h2>
         <ul>
           <li>ICOM: вход слева, управление сверху, выход справа, механизм снизу.</li>
-          <li>A-0 — один блок. Декомпозиция 1-го уровня — A0 с блоками A1…An (обычно 3–6).</li>
-          <li>2-й уровень: A1 → A11, A12… Дерево узлов — оглавление без стрелок.</li>
+          <li>A-0 — один блок. Декомпозиция A0 — блоки A1…An (обычно 3–6).</li>
+          <li>Дети блока A3 нумеруются A31, A32… Стрелки родителя должны найтись у детей.</li>
         </ul>
       </article>
       <article>
         <h2>DFD</h2>
         <ul>
           <li>Процесс — скруглённый прямоугольник, поток, хранилище с полоской слева, внешняя сущность.</li>
-          <li>Контекст: один процесс. Уровень 1: 1.0, 2.0… Хранилище не стыковать с внешним миром напрямую.</li>
-          <li>Баланс: внешние потоки родителя = внешние потоки детей.</li>
+          <li>Контекст: один процесс-система и внешние сущности. Хранилище не стыковать с внешним миром напрямую.</li>
+          <li>У процесса есть вход и выход: без выхода — «чёрная дыра», без входа — «чудо».</li>
         </ul>
       </article>
     </div>
@@ -73,28 +73,29 @@ h1 {
   gap: 12px;
 }
 article {
-  background: rgba(14, 32, 42, 0.85);
-  border: 1px solid rgba(62, 200, 216, 0.2);
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow);
   border-radius: 16px;
   padding: 16px;
 }
 h2 {
   margin: 0 0 8px;
   font-size: 16px;
-  color: #e8b86d;
+  color: var(--gold);
   font-family: Unbounded, sans-serif;
 }
 ul {
   margin: 0;
   padding-left: 18px;
-  color: #c5d5de;
+  color: var(--ink);
 }
 .ghost {
   justify-self: start;
   font: inherit;
   background: transparent;
-  color: #8aa3b3;
-  border: 1px solid rgba(138, 163, 179, 0.3);
+  color: var(--muted);
+  border: 1px solid rgba(93, 116, 130, 0.3);
   border-radius: 999px;
   padding: 6px 12px;
   cursor: pointer;
