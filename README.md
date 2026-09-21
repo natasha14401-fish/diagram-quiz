@@ -13,17 +13,18 @@
 
 Режимы: **экзамен**, **тренажёр по теме**, **угадай чертёж** и **конструктор** — сборка прецедентов, классов, IDEF0, DFD, компонентов и развёртывания на чертёжном столе. Есть шпаргалка и разбор ошибок.
 
-Перед экзаменом студент указывает группу и ФИО. Результат уходит в Firebase (коллекция `attempts`); смотреть журнал: Firebase Console → Firestore.
+Перед экзаменом студент указывает группу и ФИО. Результат уходит в Firebase (коллекция `attempts`). Преподаватель смотрит журнал в игре: ссылка **Журнал преподавателя**.
 
 ## Журнал в Firebase
 
 1. https://console.firebase.google.com → **Add project**
 2. Добавьте веб-приложение (`</>`), скопируйте `firebaseConfig`
-3. Authentication → Anonymous → Enable
-4. Firestore → Create database (production) → вставьте правила из `firestore.rules`
-5. Authentication → Settings → Authorized domains: `localhost` и `natasha14401-fish.github.io`
-6. Локально скопируйте `.env.example` в `.env` и вставьте ключи
-7. Для сайта: GitHub → Settings → Secrets and variables → Actions — те же `VITE_FIREBASE_*`
+3. Authentication → Sign-in method → **Anonymous** и **Email/Password** → Enable
+4. Authentication → Users → **Add user**: почта преподавателя и пароль
+5. Firestore → Create database (production) → вставьте правила из `firestore.rules` (в `isAdmin()` должна быть та же почта) → Publish
+6. Authentication → Settings → Authorized domains: `localhost` и `natasha14401-fish.github.io`
+7. Локально скопируйте `.env.example` в `.env` и вставьте ключи
+8. Для сайта: GitHub → Settings → Secrets — `VITE_FIREBASE_*` и `VITE_ADMIN_EMAIL`
 
 ## Запуск локально
 

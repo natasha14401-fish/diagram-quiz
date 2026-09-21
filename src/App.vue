@@ -5,6 +5,7 @@ import QuizView from './components/QuizView.vue'
 import ResultsView from './components/ResultsView.vue'
 import SheetView from './components/SheetView.vue'
 import BuildView from './components/BuildView.vue'
+import AdminView from './components/AdminView.vue'
 import { buildSession, QUESTIONS, saveStats } from './data/content.js'
 import { saveAttempt, loadStudent } from './firebase.js'
 
@@ -53,7 +54,7 @@ function mistakes() {
 </script>
 
 <template>
-  <div class="app" :class="{ wide: screen === 'build' || screen === 'quiz' }">
+  <div class="app" :class="{ wide: screen === 'build' || screen === 'quiz' || screen === 'admin' }">
     <header class="top">
       <span class="logo" @click="screen = 'home'">⬡ Диаграммист</span>
       <span class="cap">UML · IDEF0 · DFD</span>
@@ -64,6 +65,7 @@ function mistakes() {
         @start="start"
         @sheet="screen = 'sheet'"
         @build="openBuild"
+        @admin="screen = 'admin'"
       />
       <QuizView v-else-if="screen === 'quiz'" :session="session" @quit="screen = 'home'" @finish="finish" />
       <ResultsView
@@ -75,6 +77,7 @@ function mistakes() {
         @mistakes="mistakes"
       />
       <BuildView v-else-if="screen === 'build'" :mission-id="missionId" @quit="screen = 'home'" />
+      <AdminView v-else-if="screen === 'admin'" @back="screen = 'home'" />
       <SheetView v-else-if="screen === 'sheet'" @back="screen = 'home'" />
     </main>
     <footer>

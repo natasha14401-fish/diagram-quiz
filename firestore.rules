@@ -1,6 +1,11 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'natasha144.01@gmail.com';
+    }
+
     match /attempts/{id} {
       allow create: if request.auth != null
         && request.resource.data.name is string
@@ -10,7 +15,8 @@ service cloud.firestore {
         && request.resource.data.group.size() > 0
         && request.resource.data.group.size() <= 40
         && request.resource.data.mode == 'exam';
-      allow read, update, delete: if false;
+      allow read: if isAdmin();
+      allow update, delete: if false;
     }
   }
 }

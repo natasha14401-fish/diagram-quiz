@@ -4,7 +4,7 @@ import { TOPICS, loadStats } from '../data/content.js'
 import { MISSIONS } from '../data/missions.js'
 import { loadStudent, saveStudent } from '../firebase.js'
 
-const emit = defineEmits(['start', 'sheet', 'build'])
+const emit = defineEmits(['start', 'sheet', 'build', 'admin'])
 const stats = ref({ exams: 0, best: 0, played: 0 })
 const topic = ref(TOPICS[0].id)
 const mission = ref(MISSIONS[0].id)
@@ -114,7 +114,10 @@ function startExam() {
     </div>
 
     <div class="meta">
-      <button class="link" type="button" @click="emit('sheet')">Шпаргалка по нотациям</button>
+      <div class="links">
+        <button class="link" type="button" @click="emit('sheet')">Шпаргалка по нотациям</button>
+        <button class="link" type="button" @click="emit('admin')">Журнал преподавателя</button>
+      </div>
       <ul class="stats">
         <li>Сессий: {{ stats.played }}</li>
         <li>Экзаменов: {{ stats.exams }}</li>
@@ -278,6 +281,11 @@ h1 {
   gap: 16px;
   flex-wrap: wrap;
   align-items: center;
+}
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
 }
 .link {
   background: none;

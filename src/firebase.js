@@ -1,6 +1,20 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth, signInAnonymously } from 'firebase/auth'
-import { addDoc, collection, getFirestore, serverTimestamp } from 'firebase/firestore'
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInAnonymously,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth'
+import {
+  addDoc,
+  collection,
+  getDocs,
+  getFirestore,
+  orderBy,
+  query,
+  serverTimestamp,
+} from 'firebase/firestore'
 
 const config = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -12,6 +26,8 @@ const config = {
 }
 
 const STUDENT_KEY = 'diagram-quiz-student'
+
+export const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'natasha144.01@gmail.com'
 
 export function firebaseReady() {
   return Boolean(config.apiKey && config.projectId)
@@ -73,4 +89,47 @@ export async function saveAttempt(result, student) {
     console.error('Firebase: не удалось сохранить попытку', err)
     return 'error'
   }
+}
+
+export function watchAdmin(callback) {
+  const ctx = services()
+  if (!ctx) {
+    callback(null)
+    return () => {}
+  }
+  return onAuthStateChanged(ctx.auth, (user) => {
+    callback(user?.email ? { email: user.email, uid: user.uid } : null)
+  })
+}
+
+export async function signInAdmin(email, password) {
+  const ctx = services()
+  if (!ctx) throw new Error('Firebase не настроен')
+  if (ctx.auth.currentUser) await signOut(ctx.auth)
+  await signInWithEmailAndPassword(ctx.auth, email.trim(), password)
+}
+
+export async function signOutAdmin() {
+  const ctx = services()
+  if (ctx?.auth.currentUser) await signOut(ctx.auth)
+}
+
+export async function loadAttempts() {
+  const ctx = services()
+  if (!ctx) throw new Error('Firebase не настроен')
+  const snap = await getDocs(query(collection(ctx.db, 'attempts'), orderBy('at', 'desc')))
+  return snap.docs.map((doc) => {
+    const row = doc.data()
+    return {
+      id: doc.id,
+      name: row.name || '',
+      group: row.group || '',
+      percent: row.percent ?? 0,
+      right: row.right ?? 0,
+      total: row.total ?? 0,
+      passed: Boolean(row.passed),
+      expired: Boolean(row.expired),
+      at: row.at?.toDate?.() || null,
+    }
+  })
 }
