@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { MISSIONS, PALETTE, LINK_KINDS, checkMission, icomSide } from '../data/missions.js'
+import { MISSIONS, LINK_KINDS, checkMission, icomSide, paletteFor } from '../data/missions.js'
 
 const props = defineProps({
   missionId: { type: String, default: '' },
@@ -51,11 +51,43 @@ const remaining = computed(() => {
 })
 
 const selectedNode = computed(() => nodes.value.find((n) => n.id === selected.value) || null)
+const activePalette = computed(() => paletteFor(mission.value))
 
 const directedKinds = new Set(['flow', 'include', 'extend', 'dependency', 'generalization', 'composition', 'icom'])
 
 function isDirected(kind) {
   return directedKinds.has(kind)
+}
+
+function splitLines(text, fallback) {
+  const rows = String(text || '')
+    .split(/\n/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+  return rows.length ? rows : fallback
+}
+
+function classBox(n) {
+  const attrs = splitLines(n.attrs, ['− имя: строка'])
+  const ops = splitLines(n.ops, ['+ метод()'])
+  const row = 15
+  const head = 28
+  const pad = 10
+  const attrH = attrs.length * row + pad
+  const opH = ops.length * row + pad
+  const w = 190
+  const h = head + attrH + opH
+  return {
+    w,
+    h,
+    hw: w / 2,
+    hh: h / 2,
+    head,
+    attrH,
+    attrs,
+    ops,
+    row,
+  }
 }
 
 function reset() {
@@ -72,6 +104,7 @@ function reset() {
   eid = 1
   xid = 1
   edgeKind.value = mission.value.tools?.[0] || 'association'
+  customKind.value = paletteFor(mission.value)[0]?.kind || 'function'
 }
 
 function toSvg(evt) {
@@ -100,8 +133,12 @@ function addCustom() {
     kind: customKind.value,
     label,
     tag: customTag.value.trim(),
-    attrs: customAttrs.value.trim(),
-    ops: customOps.value.trim(),
+    attrs:
+      customKind.value === 'class'
+        ? customAttrs.value.trim() || '− имя: строка'
+        : customAttrs.value.trim(),
+    ops:
+      customKind.value === 'class' ? customOps.value.trim() || '+ метод()' : customOps.value.trim(),
   })
   customLabel.value = ''
   customTag.value = ''
@@ -303,20 +340,44 @@ const allowedLinks = computed(() => {
 
         <p class="side-t">Свой элемент</p>
         <select v-model="customKind" class="field">
-          <option v-for="s in PALETTE" :key="s.kind" :value="s.kind">{{ s.title }}</option>
+          <option v-for="s in activePalette" :key="s.kind" :value="s.kind">{{ s.title }}</option>
         </select>
         <input v-model="customLabel" class="field" placeholder="Имя / функция" />
         <input v-model="customTag" class="field" placeholder="Номер: A11, 1.1, D3…" />
-        <textarea v-if="customKind === 'class'" v-model="customAttrs" class="field" rows="2" placeholder="Атрибуты" />
-        <textarea v-if="customKind === 'class'" v-model="customOps" class="field" rows="2" placeholder="Операции" />
+        <textarea
+          v-if="customKind === 'class'"
+          v-model="customAttrs"
+          class="field"
+          rows="3"
+          placeholder="Каждый атрибут с новой строки:&#10;− код: целое&#10;− имя: строка"
+        />
+        <textarea
+          v-if="customKind === 'class'"
+          v-model="customOps"
+          class="field"
+          rows="3"
+          placeholder="Каждая операция с новой строки:&#10;+ оформить(): заказ"
+        />
         <button type="button" class="piece" @click="addCustom">Добавить в набор</button>
 
         <div v-if="selectedNode" class="insp">
           <p class="side-t">Выбранный блок</p>
           <input v-model="selectedNode.label" class="field" />
           <input v-model="selectedNode.tag" class="field" placeholder="Номер" />
-          <textarea v-if="selectedNode.kind === 'class'" v-model="selectedNode.attrs" class="field" rows="2" />
-          <textarea v-if="selectedNode.kind === 'class'" v-model="selectedNode.ops" class="field" rows="2" />
+          <textarea
+            v-if="selectedNode.kind === 'class'"
+            v-model="selectedNode.attrs"
+            class="field"
+            rows="3"
+            placeholder="− имя: строка"
+          />
+          <textarea
+            v-if="selectedNode.kind === 'class'"
+            v-model="selectedNode.ops"
+            class="field"
+            rows="3"
+            placeholder="+ метод()"
+          />
         </div>
 
         <div class="tools">
@@ -378,12 +439,43 @@ const allowedLinks = computed(() => {
               <text text-anchor="middle" dy="4">{{ n.label }}</text>
             </template>
             <template v-else-if="n.kind === 'class'">
-              <rect x="-78" y="-58" width="156" height="116" />
-              <line x1="-78" y1="-28" x2="78" y2="-28" />
-              <line x1="-78" y1="18" x2="78" y2="18" />
-              <text y="-38" text-anchor="middle">{{ n.label }}</text>
-              <text class="tiny" y="-8" text-anchor="middle">{{ (n.attrs || 'атрибуты').replaceAll('\n', ' · ') }}</text>
-              <text class="tiny" y="40" text-anchor="middle">{{ (n.ops || 'операции').replaceAll('\n', ' · ') }}</text>
+              <rect
+                :x="-classBox(n).hw"
+                :y="-classBox(n).hh"
+                :width="classBox(n).w"
+                :height="classBox(n).h"
+              />
+              <line
+                :x1="-classBox(n).hw"
+                :y1="-classBox(n).hh + classBox(n).head"
+                :x2="classBox(n).hw"
+                :y2="-classBox(n).hh + classBox(n).head"
+              />
+              <line
+                :x1="-classBox(n).hw"
+                :y1="-classBox(n).hh + classBox(n).head + classBox(n).attrH"
+                :x2="classBox(n).hw"
+                :y2="-classBox(n).hh + classBox(n).head + classBox(n).attrH"
+              />
+              <text :y="-classBox(n).hh + 18" text-anchor="middle">{{ n.label }}</text>
+              <text
+                v-for="(line, i) in classBox(n).attrs"
+                :key="'a' + i"
+                class="tiny"
+                :x="-classBox(n).hw + 10"
+                :y="-classBox(n).hh + classBox(n).head + 14 + i * classBox(n).row"
+              >
+                {{ line }}
+              </text>
+              <text
+                v-for="(line, i) in classBox(n).ops"
+                :key="'o' + i"
+                class="tiny"
+                :x="-classBox(n).hw + 10"
+                :y="-classBox(n).hh + classBox(n).head + classBox(n).attrH + 14 + i * classBox(n).row"
+              >
+                {{ line }}
+              </text>
             </template>
             <template v-else-if="n.kind === 'object'">
               <rect x="-70" y="-28" width="140" height="56" />
@@ -408,7 +500,7 @@ const allowedLinks = computed(() => {
               <text text-anchor="middle" dy="4">{{ n.label }}</text>
             </template>
             <template v-else-if="n.kind === 'process'">
-              <circle r="52" />
+              <rect x="-68" y="-36" width="136" height="72" rx="14" />
               <text class="tiny" dy="-8" text-anchor="middle">{{ n.tag }}</text>
               <text dy="12" text-anchor="middle">{{ n.label }}</text>
             </template>
@@ -417,7 +509,9 @@ const allowedLinks = computed(() => {
               <text text-anchor="middle" dy="4">{{ n.label }}</text>
             </template>
             <template v-else-if="n.kind === 'store'">
-              <path class="line" d="M-78 -22 h156 M-78 22 h156" />
+              <rect x="-78" y="-24" width="156" height="48" class="store-fill" />
+              <rect x="-78" y="-24" width="12" height="48" class="store-bar" />
+              <path class="line" d="M-78 -24 h156 M-78 24 h156 M-78 -24 v48" />
               <text text-anchor="middle" dy="4">{{ n.tag }} {{ n.label }}</text>
             </template>
             <template v-else-if="n.kind === 'component'">
@@ -620,6 +714,14 @@ svg {
 }
 .node path.line {
   fill: none;
+}
+.node rect.store-fill {
+  fill: #0b1c26;
+  stroke: none;
+}
+.node rect.store-bar {
+  fill: #c9a0ff;
+  stroke: none;
 }
 .node text {
   fill: #e8f1f5;

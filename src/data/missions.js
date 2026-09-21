@@ -77,14 +77,14 @@ export const MISSIONS = [
     hint: 'Обобщение — стрелка к родителю. Композиция — сильное «часть–целое», от заказа к позиции.',
     tools: ['association', 'generalization', 'composition'],
     kit: [
-      { kind: 'class', label: 'Пользователь', attrs: '− email: string', ops: '+ войти()' },
-      { kind: 'class', label: 'Клиент', attrs: '− скидка: %', ops: '+ оформить()' },
-      { kind: 'class', label: 'Менеджер', attrs: '− табель', ops: '+ подтвердить()' },
-      { kind: 'class', label: 'Заказ', attrs: '− дата\n− статус', ops: '+ сумма()' },
-      { kind: 'class', label: 'Позиция', attrs: '− кол-во', ops: '+ стоимость()' },
-      { kind: 'class', label: 'Товар', attrs: '− артикул\n− цена', ops: '' },
-      { kind: 'class', label: 'Категория', attrs: '− название', ops: '' },
-      { kind: 'class', label: 'Оплата', attrs: '− способ\n− сумма', ops: '+ провести()' },
+      { kind: 'class', label: 'Пользователь', attrs: '− почта: строка', ops: '+ войти()' },
+      { kind: 'class', label: 'Клиент', attrs: '− скидка: число', ops: '+ оформить(): заказ' },
+      { kind: 'class', label: 'Менеджер', attrs: '− табель: строка', ops: '+ подтвердить()' },
+      { kind: 'class', label: 'Заказ', attrs: '− дата: дата\n− статус: строка', ops: '+ сумма(): деньги' },
+      { kind: 'class', label: 'Позиция', attrs: '− количество: целое', ops: '+ стоимость(): деньги' },
+      { kind: 'class', label: 'Товар', attrs: '− артикул: строка\n− цена: деньги', ops: '+ цена(): деньги' },
+      { kind: 'class', label: 'Категория', attrs: '− название: строка', ops: '' },
+      { kind: 'class', label: 'Оплата', attrs: '− способ: строка\n− сумма: деньги', ops: '+ провести(): логический' },
     ],
     require: {
       directed: [
@@ -370,6 +370,12 @@ export const MISSIONS = [
     require: {},
   },
 ]
+
+export function paletteFor(mission) {
+  if (!mission || mission.sandbox || !(mission.kit || []).length) return PALETTE
+  const kinds = new Set(mission.kit.map((p) => p.kind))
+  return PALETTE.filter((p) => kinds.has(p.kind))
+}
 
 function nodeByLabel(nodes, label) {
   return nodes.find((n) => n.label === label)
