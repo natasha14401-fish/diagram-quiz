@@ -13,6 +13,18 @@
 
 Режимы: **экзамен**, **тренажёр по теме**, **угадай чертёж** и **конструктор** — сборка прецедентов, классов, IDEF0, DFD, компонентов и развёртывания на чертёжном столе. Есть шпаргалка и разбор ошибок.
 
+Перед экзаменом студент указывает группу и ФИО. Результат уходит в Firebase (коллекция `attempts`); смотреть журнал: Firebase Console → Firestore.
+
+## Журнал в Firebase
+
+1. https://console.firebase.google.com → **Add project**
+2. Добавьте веб-приложение (`</>`), скопируйте `firebaseConfig`
+3. Authentication → Anonymous → Enable
+4. Firestore → Create database (production) → вставьте правила из `firestore.rules`
+5. Authentication → Settings → Authorized domains: `localhost` и `natasha14401-fish.github.io`
+6. Локально скопируйте `.env.example` в `.env` и вставьте ключи
+7. Для сайта: GitHub → Settings → Secrets and variables → Actions — те же `VITE_FIREBASE_*`
+
 ## Запуск локально
 
 ```bash

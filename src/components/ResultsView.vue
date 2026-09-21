@@ -4,6 +4,7 @@ import { TOPICS, rankFor } from '../data/content.js'
 
 const props = defineProps({
   result: { type: Object, required: true },
+  sync: { type: String, default: 'skip' },
 })
 const emit = defineEmits(['home', 'retry', 'mistakes'])
 
@@ -29,6 +30,9 @@ const mistakes = computed(() => props.result.answers.filter((a) => !a.ok))
       {{ result.right }} из {{ result.total }} {{ result.mode === 'exam' ? 'баллов' : 'верно' }}
       <span v-if="result.mode === 'exam'"> · экзамен {{ passed ? 'сдан' : 'не сдан' }} (нужно 70%)</span>
     </p>
+    <p v-if="result.mode === 'exam' && sync === 'pending'" class="sync">Отправляем результат преподавателю…</p>
+    <p v-else-if="sync === 'ok'" class="sync ok">Результат записан в журнал.</p>
+    <p v-else-if="sync === 'error'" class="sync bad">Не удалось отправить в журнал. Проверьте сеть и поля ФИО / группа.</p>
     <div class="topics">
       <div v-for="t in byTopic" :key="t.id" class="row">
         <span>{{ t.title }}</span>
@@ -90,6 +94,17 @@ h1 {
 .sum {
   color: var(--muted);
   margin: 0 0 8px;
+}
+.sync {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.sync.ok {
+  color: var(--ok);
+}
+.sync.bad {
+  color: var(--rose);
 }
 .topics {
   width: 100%;

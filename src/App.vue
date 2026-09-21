@@ -6,12 +6,14 @@ import ResultsView from './components/ResultsView.vue'
 import SheetView from './components/SheetView.vue'
 import BuildView from './components/BuildView.vue'
 import { buildSession, QUESTIONS, saveStats } from './data/content.js'
+import { saveAttempt, loadStudent } from './firebase.js'
 
 const screen = ref('home')
 const session = ref(null)
 const result = ref(null)
 const lastConfig = ref({ mode: 'exam' })
 const missionId = ref('')
+const sync = ref('skip')
 
 const year = computed(() => new Date().getFullYear())
 
@@ -21,10 +23,12 @@ function start(config) {
   screen.value = 'quiz'
 }
 
-function finish(payload) {
+async function finish(payload) {
   result.value = payload
   saveStats(payload)
+  sync.value = payload.mode === 'exam' ? 'pending' : 'skip'
   screen.value = 'results'
+  if (payload.mode === 'exam') sync.value = await saveAttempt(payload, loadStudent())
 }
 
 function retry() {
@@ -65,6 +69,7 @@ function mistakes() {
       <ResultsView
         v-else-if="screen === 'results'"
         :result="result"
+        :sync="sync"
         @home="screen = 'home'"
         @retry="retry"
         @mistakes="mistakes"

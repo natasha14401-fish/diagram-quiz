@@ -2,15 +2,37 @@
 import { onMounted, ref } from 'vue'
 import { TOPICS, loadStats } from '../data/content.js'
 import { MISSIONS } from '../data/missions.js'
+import { loadStudent, saveStudent } from '../firebase.js'
 
 const emit = defineEmits(['start', 'sheet', 'build'])
 const stats = ref({ exams: 0, best: 0, played: 0 })
 const topic = ref(TOPICS[0].id)
 const mission = ref(MISSIONS[0].id)
+const student = ref({ name: '', group: '' })
+const needId = ref(false)
 
 onMounted(() => {
   stats.value = loadStats()
+  student.value = loadStudent()
 })
+
+function remember() {
+  student.value = saveStudent(student.value)
+}
+
+function identified() {
+  remember()
+  return student.value.name && student.value.group
+}
+
+function startExam() {
+  if (!identified()) {
+    needId.value = true
+    return
+  }
+  needId.value = false
+  emit('start', { mode: 'exam' })
+}
 </script>
 
 <template>
@@ -22,8 +44,20 @@ onMounted(() => {
       и не перепутайте уровень декомпозиции. UML, IDEF0 и DFD — как на зачёте, только с листом.
     </p>
 
+    <div class="who">
+      <label>
+        Группа
+        <input v-model="student.group" type="text" maxlength="40" placeholder="ИСб-31" @change="remember" />
+      </label>
+      <label>
+        ФИО
+        <input v-model="student.name" type="text" maxlength="80" placeholder="Иванова А. С." @change="remember" />
+      </label>
+      <p v-if="needId" class="who-err">Для экзамена укажите группу и фамилию — так результат попадёт в журнал.</p>
+    </div>
+
     <div class="modes">
-      <button class="mode exam" type="button" @click="emit('start', { mode: 'exam' })">
+      <button class="mode exam" type="button" @click="startExam">
         <span class="tag">8 вопросов + 2 чертежа · 20 минут</span>
         <strong>Экзамен</strong>
         <em>Теория и построение диаграмм. Чертёж даёт 2 балла. Проходной — 70%.</em>
@@ -115,6 +149,41 @@ h1 {
   max-width: 58ch;
   color: var(--muted);
   font-size: 18px;
+}
+.who {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 12px;
+  max-width: 560px;
+}
+.who label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+}
+.who input {
+  font: inherit;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.who-err {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--rose);
+  font-size: 14px;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 500;
 }
 .modes {
   display: grid;
@@ -229,6 +298,9 @@ h1 {
 }
 @media (max-width: 720px) {
   .modes {
+    grid-template-columns: 1fr;
+  }
+  .who {
     grid-template-columns: 1fr;
   }
 }
